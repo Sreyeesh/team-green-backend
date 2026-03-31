@@ -1,5 +1,10 @@
+import uuid
 from django.db import models
 from shops.models import Shop, Barber, Service
+
+
+def _short_code():
+    return uuid.uuid4().hex[:8].upper()
 
 
 class Booking(models.Model):
@@ -21,6 +26,7 @@ class Booking(models.Model):
     customer_email = models.EmailField()
     customer_phone = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    confirmation_code = models.CharField(max_length=8, unique=True, default=_short_code, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

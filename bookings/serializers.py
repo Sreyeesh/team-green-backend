@@ -53,8 +53,9 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = [
-            'id', 'shop', 'barber', 'service', 'datetime', 'duration_minutes',
-            'customer_name', 'customer_email', 'customer_phone', 'status', 'created_at',
+            'id', 'confirmation_code', 'shop', 'barber', 'service', 'datetime',
+            'duration_minutes', 'customer_name', 'customer_email', 'customer_phone',
+            'status', 'created_at',
         ]
 
 

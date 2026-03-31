@@ -5,6 +5,7 @@ urlpatterns = [
     # Public
     path('', views.BookingCreateView.as_view(), name='booking-create'),
     path('<int:pk>/', views.BookingDetailView.as_view(), name='booking-detail'),
+    path('confirm/<str:code>/', views.BookingConfirmView.as_view(), name='booking-confirm'),
 
     # Admin
     path('admin/', views.AdminBookingListView.as_view(), name='admin-bookings'),

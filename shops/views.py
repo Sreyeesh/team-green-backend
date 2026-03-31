@@ -63,8 +63,22 @@ class ShopAvailabilityView(APIView):
             )
 
         slot_duration = datetime.timedelta(minutes=service.duration_minutes)
-        day_start = datetime.datetime.combine(date, datetime.time(9, 0))
-        day_end = datetime.datetime.combine(date, datetime.time(18, 0))
+
+        # Use shop hours for this day, fall back to 09:00–18:00
+        day_name = date.strftime('%a').lower()  # mon, tue, wed...
+        day_hours = shop.hours.get(day_name, {})
+        open_str = day_hours.get('open', '09:00')
+        close_str = day_hours.get('close', '18:00')
+
+        try:
+            open_time = datetime.time.fromisoformat(open_str)
+            close_time = datetime.time.fromisoformat(close_str)
+        except ValueError:
+            open_time = datetime.time(9, 0)
+            close_time = datetime.time(18, 0)
+
+        day_start = datetime.datetime.combine(date, open_time)
+        day_end = datetime.datetime.combine(date, close_time)
 
         existing = Booking.objects.filter(
             barber=barber,

@@ -27,6 +27,14 @@ class BookingDetailView(APIView):
         return Response(BookingSerializer(booking).data)
 
 
+class BookingConfirmView(APIView):
+    """GET /api/bookings/confirm/:code — guest lookup by confirmation code"""
+
+    def get(self, request, code):
+        booking = get_object_or_404(Booking, confirmation_code=code.upper())
+        return Response(BookingSerializer(booking).data)
+
+
 class AdminBookingListView(APIView):
     """GET /api/admin/bookings?date=YYYY-MM-DD&status="""
     permission_classes = [IsAuthenticated]
