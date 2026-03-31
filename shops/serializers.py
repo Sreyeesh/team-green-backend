@@ -24,3 +24,9 @@ class ShopUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
         fields = ['name', 'description', 'logo_url', 'address', 'phone', 'hours']
+
+
+class AvailabilitySlotSerializer(serializers.Serializer):
+    datetime = serializers.DateTimeField()
+    barber_id = serializers.IntegerField()
+    available = serializers.BooleanField()
