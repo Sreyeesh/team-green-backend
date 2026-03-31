@@ -1,6 +1,68 @@
 # Backend Setup Guide for Johan
 
-Hey Johan! This is everything you need to get the backend running locally and start hitting the API from the frontend.
+Hey Johan! This is everything you need to get the backend running locally, hit the API from the frontend, and demo it during the presentation.
+
+---
+
+## Presentation Checklist
+
+Before going on stage, make sure:
+
+- [ ] Backend running: `python manage.py runserver 8080`
+- [ ] Frontend running: `npm run dev`
+- [ ] Seed data loaded: `python manage.py seed`
+- [ ] Swagger open in a tab: `http://localhost:8080/api/docs/`
+- [ ] Frontend open in a tab: `http://localhost:5174/`
+- [ ] Admin login ready (see credentials below)
+
+---
+
+## Demo Login Credentials
+
+Use these to log into the admin panel during the presentation:
+
+| Field    | Value                    |
+|----------|--------------------------|
+| Email    | `owner@freshcuts.com`    |
+| Password | `hackathon123`           |
+
+**Via the frontend** — go to `http://localhost:5174/` and log in with the credentials above.
+
+**Via Swagger** — go to `http://localhost:8080/api/docs/`, find **LoginView**, click **Try it out**, and enter:
+```json
+{
+  "email": "owner@freshcuts.com",
+  "password": "hackathon123"
+}
+```
+
+**Via terminal** — quick test:
+```bash
+curl -s -X POST http://localhost:8080/api/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"email": "owner@freshcuts.com", "password": "hackathon123"}'
+```
+
+The response gives you a `token` — use it in admin requests:
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## Demo Shop Data
+
+The seed command pre-loads everything needed for the demo:
+
+| | |
+|---|---|
+| Shop name | Fresh Cuts Barbershop |
+| Shop slug | `fresh-cuts` |
+| Barbers | Marcus Reid, Priya Nair |
+| Services | Classic Haircut · Skin Fade · Beard Trim & Shape · Cut & Beard Combo |
+| Bookings | 3 pre-made bookings for tomorrow (confirmed + pending) |
+
+To reset demo data at any point: `python manage.py seed --flush && python manage.py seed`
 
 ---
 
@@ -27,7 +89,7 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Open `.env` and it should look like this — no changes needed for local dev:
+Open `.env` — no changes needed for local dev:
 
 ```
 SECRET_KEY=your-secret-key-here
@@ -43,19 +105,6 @@ python manage.py migrate
 python manage.py seed
 ```
 
-The seed command gives you a ready-to-go demo shop:
-
-| | |
-|---|---|
-| Shop slug | `fresh-cuts` |
-| Admin email | `owner@freshcuts.com` |
-| Admin password | `hackathon123` |
-| Barbers | Marcus Reid, Priya Nair |
-| Services | Classic Haircut, Skin Fade, Beard Trim, Cut & Beard Combo |
-| Bookings | 3 pre-made bookings for tomorrow |
-
-To wipe and start fresh: `python manage.py seed --flush`
-
 ---
 
 ## 4. Start the Server
@@ -70,23 +119,21 @@ python manage.py runserver 8080
 
 ## 5. API Docs (Swagger)
 
-Once the server is running, open:
-
 ```
 http://localhost:8080/api/docs/
 ```
 
-Every endpoint is documented with request body, response shape, and a **Try it out** button — no Postman needed.
+Every endpoint has request body, response shape, and a **Try it out** button — no Postman needed.
 
 ---
 
 ## 6. How the Frontend Connects
 
-The frontend proxies all `/api/*` calls to `http://localhost:8080` automatically via Vite — no CORS setup needed, no hardcoded URLs.
+The frontend proxies all `/api/*` calls to `http://localhost:8080` automatically via Vite — no CORS setup, no hardcoded URLs.
 
-Just make sure:
-- Backend is running on port **8080**
-- Frontend is running (`npm run dev`) — it'll be on `http://localhost:5173` or `5174`
+Make sure:
+- Backend is on port **8080**
+- Frontend is running (`npm run dev`) — available at `http://localhost:5173` or `5174`
 
 ---
 
@@ -107,35 +154,33 @@ GET  /api/bookings/confirm/:code/
 ### Auth
 
 ```
-POST /api/auth/register/    → { token, refresh, shop }
-POST /api/auth/login/       → { token, refresh, shop }
+POST /api/auth/register/         → { token, refresh, shop }
+POST /api/auth/login/            → { token, refresh, shop }
 POST /api/auth/token/refresh/
 ```
 
-Store the `token` as `admin_token` in localStorage — the frontend already handles this.
-
-### Admin (requires `Authorization: Bearer <token>` header)
+### Admin (requires `Authorization: Bearer <token>`)
 
 ```
-GET  PUT  /api/admin/shop/
-GET  POST /api/admin/barbers/
+GET  PUT    /api/admin/shop/
+GET  POST   /api/admin/barbers/
 PUT  DELETE /api/admin/barbers/:id/
-GET  POST /api/admin/services/
+GET  POST   /api/admin/services/
 PUT  DELETE /api/admin/services/:id/
-GET  /api/admin/bookings/?date=2026-04-01&status=pending
-PUT  /api/admin/bookings/:id/
+GET         /api/admin/bookings/?date=2026-04-01&status=pending
+PUT         /api/admin/bookings/:id/
 ```
 
 ---
 
 ## 8. Troubleshooting
 
-**`ModuleNotFoundError`** — make sure your venv is activated: `source venv/bin/activate`
+**`ModuleNotFoundError`** — activate the venv: `source venv/bin/activate`
 
-**`Port already in use`** — use a different port: `python manage.py runserver 8081`
+**`Port already in use`** — try: `python manage.py runserver 8081`
 
-**`401 Unauthorized` on admin endpoints** — make sure you're sending the JWT: `Authorization: Bearer <token>`
+**`401 Unauthorized`** — include the JWT header: `Authorization: Bearer <token>`
 
-**Empty responses** — run `python manage.py seed` to populate the database
+**Empty API responses** — seed the database: `python manage.py seed`
 
 **Need to reset everything** — `python manage.py seed --flush` then `python manage.py seed`
